@@ -181,6 +181,44 @@ curl -H "X-API-KEY: $API_KEY" http://localhost:8080/api/tasks/$JOB_ID/status
 curl -H "X-API-KEY: $API_KEY" http://localhost:8080/api/tasks/$JOB_ID/result -o temp/async_output.wav
 ```
 
+## Google Cloud Run へのデプロイ手順
+
+```
+export GCLOUD_PROJECT=$(gcloud config get-value project)
+export REPOSITORY_NAME="podman-voicevox-api"
+export LOCATION="asia-northeast1"
+
+# Artifact Registry に Docker リポジトリを作成
+gcloud artifacts repositories create ${REPOSITORY_NAME} \
+    --repository-format=docker \
+    --location=${LOCATION} \
+    --description="Repository for ${REPOSITORY_NAME}"
+
+# Artifact Registry への認証設定
+gcloud auth configure-docker ${LOCATION}-docker.pkg.dev
+
+# イメージ ビルド
+PLATFORM=linux/amd64
+podman compose build
+
+# イメージへのタグ付け
+## 元のイメージ名
+export SOURCE_IMAGE="$(podman images | grep -m 1 podman-voicevox-api-voicevox-api | awk '{print $1":"$2}')"
+echo "Source Image: $SOURCE_IMAGE"
+
+## Artifact Registry 用の新しいタグ名
+export VERSION="1.2"
+TARGET_IMAGE="${LOCATION}-docker.pkg.dev/${GCLOUD_PROJECT}/${REPOSITORY_NAME}/podman-voicevox-api-voicevox-api:v${VERSION}"
+echo "Target Image: $TARGET_IMAGE"
+
+## podman tag コマンドで新しいタグを付与
+podman tag ${SOURCE_IMAGE} ${TARGET_IMAGE}
+
+## Artifact Registry へのプッシュ
+podman push ${TARGET_IMAGE}
+
+```
+
 
 ## 参考
 - [Voicevox Engine GitHub](https://github.com/VoiceVox/VoiceVox)

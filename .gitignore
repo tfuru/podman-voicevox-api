@@ -65,3 +65,7 @@ db.json
 
 # Temp 
 temp/
+
+# gcloud alpha run compose up
+out/
+cloudbuild.yaml

@@ -3,9 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    platform: ${PLATFORM:-linux/amd64}
     ports:
-      - "${PORT:-8080}:8080"
+      - "8080:8080"
     env_file:
       - .env
     environment:
@@ -16,5 +15,6 @@ services:
 
   voicevox-engine:
     image: voicevox/voicevox_engine:cpu-latest
-    platform: ${PLATFORM:-linux/amd64}
     restart: unless-stopped
+    expose:
+      - "50021"

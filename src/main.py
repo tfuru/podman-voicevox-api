@@ -6,6 +6,7 @@ from routers.admin import admin_router
 from routers.synthesis import synthesis_router
 from routers.tasks import tasks_router
 from routers.origins import origins_router
+from routers.speakers import speakers_router
 from security import get_api_key
 
 # Main app instance
@@ -63,6 +64,9 @@ api_router.include_router(synthesis_router)
 
 # Tasks router
 api_router.include_router(tasks_router)
+
+# Speakers router
+api_router.include_router(speakers_router)
 
 
 # Include the main router in the app

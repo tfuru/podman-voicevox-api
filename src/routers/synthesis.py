@@ -1,6 +1,6 @@
 import requests
 from fastapi import APIRouter, HTTPException, status, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydub import AudioSegment
 import io
 
@@ -12,6 +12,10 @@ class SynthesisRequest(BaseModel):
     text: str
     speaker: int
     format: str = "wav" # New optional format field
+    speedScale: float = Field(default=1.0, ge=0.50, le=2.00)
+    pitchScale: float = Field(default=0.0, ge=-0.15, le=0.15)
+    intonationScale: float = Field(default=1.0, ge=0.00, le=2.00)
+    volumeScale: float = Field(default=1.0, ge=0.00, le=2.00)
 
 @synthesis_router.post(
     "/synthesis",
@@ -50,6 +54,12 @@ def simplified_synthesis(payload: SynthesisRequest):
         )
         query_response.raise_for_status()
         audio_query = query_response.json()
+
+        # Update query parameters with payload values
+        audio_query["speedScale"] = payload.speedScale
+        audio_query["pitchScale"] = payload.pitchScale
+        audio_query["intonationScale"] = payload.intonationScale
+        audio_query["volumeScale"] = payload.volumeScale
 
         # 2. Synthesize audio (always get WAV from Voicevox Engine)
         synthesis_params = {"speaker": payload.speaker}

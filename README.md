@@ -160,6 +160,23 @@ curl -H "X-API-KEY: $API_KEY" http://localhost:8080/api/speakers | jq
 
 #### 6. 音声合成 (簡略化されたリクエスト)
 
+音声合成エンドポイント（`POST /api/synthesis` および非同期の `POST /api/tasks/synthesis`）では、テキストや話者IDに加え、発話パラメータ（話速、音高、抑揚、音量）を調整できます。
+
+##### リクエストパラメータ (JSON形式)
+
+| パラメータ名 | 型 | 必須/任意 | デフォルト値 | 説明 |
+| :--- | :--- | :--- | :--- | :--- |
+| `text` | string | 必須 | - | 音声合成するテキスト |
+| `speaker` | integer | 必須 | - | VOICEVOXの話者スタイルID（例: 2=四国めたん ノーマル） |
+| `format` | string | 任意 | `"wav"` | 音声フォーマット（`"wav"`, `"mp3"`, `"mp4"`） |
+| `speedScale` | number | 任意 | `1.0` | 話速（範囲: 0.50 〜 2.00） |
+| `pitchScale` | number | 任意 | `0.0` | 音高（範囲: -0.15 〜 0.15） |
+| `intonationScale` | number | 任意 | `1.0` | 抑揚（範囲: 0.00 〜 2.00） |
+| `volumeScale` | number | 任意 | `1.0` | 音量（範囲: 0.00 〜 2.00） |
+
+##### リクエスト例 (curl):
+
+
 ```bash
 curl -X POST -H "X-API-KEY: $API_KEY" -H "Content-Type: application/json" \
      -d '{"text": "こんにちは、ボイスボックスです。", "speaker": 1, "format": "mp3"}' \

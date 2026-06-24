@@ -85,8 +85,8 @@ def get_synthesis_job_result(job_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
 
     if job["status"] == store.JOB_STATUS_COMPLETED:
-        if "result" in job:
-            audio_content = base64.b64decode(job["result"])
+        audio_content = store.get_job_result(job_id)
+        if audio_content is not None:
             # Determine media type from original payload format
             original_payload = job.get("payload", {})
             requested_format = original_payload.get("format", "wav")
